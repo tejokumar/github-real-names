@@ -6,15 +6,13 @@ var he = require('he');
 
 var showingRealNames = true;
 var realNames = {
-  'AndrewHunterRedGate': 'Andrew Hunter',
-  'andrewdenty': 'Andrew Denty'
 };
 
 function loadRealName(username, path) {
   if (realNames[username]) return;
   realNames[username] = username;
   request('GET', url.resolve(location.href, path)).getBody().done(function (res) {
-    var name = /\<div class\=\"vcard-fullname\" itemprop\=\"name\">([^<]+)\<\/div\>/.exec(res);
+    var name = /\<span class\=\"vcard-fullname d-block\" itemprop\=\"name\">([^<]+)\<\/span\>/.exec(res);
     name = name && he.decode(name[1]);
     realNames[username] = name || username;
     update();
@@ -49,6 +47,21 @@ function update() {
   }, function (author) {
     return author.getAttribute('href');
   });
+
+  updateList(document.getElementsByClassName('discussion-item-entity'), function (author) {
+    return author.parentElement.hasAttribute('href');
+  }, function (author) {
+    return /\/([^\/]+)$/.exec(author.parentElement.getAttribute('href'))[1];
+  }, function (author) {
+    return author.parentElement.getAttribute('href');
+  });
+
+  updateList(document.getElementsByClassName('assignee'), function (author) {
+    return true;
+  }, function (author) {
+    return /\/([^\/]+)$/.exec(author.getAttribute('href'))[1];
+  });
+
   updateList(document.querySelectorAll("[data-ga-click*='target:actor']"), function (author) {
     return author.hasAttribute('href');
   }, function (author) {
@@ -63,22 +76,6 @@ function update() {
   }, function (mention) {
     return mention.getAttribute('href');
   }, true);
-  updateList(document.getElementsByClassName('commit-author'), function (author) {
-    return true;
-  }, function (author) {
-    if (author.hasAttribute('data-user-name')) {
-      return author.getAttribute('data-user-name');
-    } else {
-      var username = author.textContent;
-      if (username.indexOf('author=') !== -1) {
-        username = username.split('author=').pop();
-      }
-      author.setAttribute('data-user-name', username);
-      return username;
-    }
-  }, function (author) {
-    return '/' + author.getAttribute('data-user-name');
-  });
   updateList(document.querySelectorAll('.opened-by a.tooltipped.tooltipped-s'), function (author) {
     return true;
   }, function (author) {
@@ -104,6 +101,7 @@ function update() {
 update();
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
   if (message.action === 'toggle') {
+    alert('updating.....');
     showingRealNames = message.showingRealNames;
     update();
   }

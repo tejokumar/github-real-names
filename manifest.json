@@ -1,12 +1,12 @@
 {
-  "name": "GitHub Real Names",
-  "description": "Use real names on GitHub",
+  "name": "Real names in EllieMae GitHub",
+  "description": "Use real names on EllieMae GitHub",
   "icons": {
-    "16": "icon.png",
-    "48": "icon.png",
-    "128": "icon.png"
+    "16": "tejo.png",
+    "48": "tejo.png",
+    "128": "tejo.png"
   },
-  "version": "1.2.2",
+  "version": "0.0.0.1",
   "permissions": [
     "activeTab",
     "tabs"
@@ -16,13 +16,13 @@
     "persistent": false
   },
   "browser_action": {
-    "default_icon": "icon.png",
-    "default_title": "Toggle using real GitHub real names"
+    "default_icon": "tejo.png",
+    "default_title": "Real names on EllieMae GitHub"
   },
   "content_scripts" : [
     {
       "matches" : [
-         "https://github.com/*"
+         "http://githubdev.dco.elmae/*", "https://github.com/*"
       ],
       "js" : [ "contentscript.js" ],
       "run_at" : "document_idle",
